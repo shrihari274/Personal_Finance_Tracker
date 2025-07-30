@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Finance Tracker{% endblock %}
+{% block content %}
+<h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-arrow-up"></i> Monthly Income</h5>
+                <h3>${{ "%.2f"|format(monthly_summary.income) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-arrow-down"></i> Monthly Expenses</h5>
+                <h3>${{ "%.2f"|format(monthly_summary.expense) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Recent Transactions</h5>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if transaction[0] == 'income' else 'danger' }}">
+                                            {{ transaction[0]|title }}
+                                        </span>
+                                    </td>
+                                    <td>${{ "%.2f"|format(transaction[1]) }}</td>
+                                    <td>{{ transaction[2] }}</td>
+                                    <td>{{ transaction[3] or '-' }}</td>
+                                    <td>{{ transaction[4] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No transactions yet. <a href="{{ url_for('add_transaction') }}">Add your first transaction</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('add_transaction') }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-plus"></i> Add Transaction
+                </a>
+                <a href="{{ url_for('export_data') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-download"></i> Export Data
+                </a>
+                <button class="btn btn-outline-info w-100" onclick="loadBudgetStatus()">
+                    <i class="fas fa-chart-pie"></i> Budget Status
+                </button>
+            </div>
+        </div>
+        <div class="card mt-3" id="budgetCard" style="display: none;">
+            <div class="card-header">
+                <h6>Budget Overview</h6>
+            </div>
+            <div class="card-body" id="budgetContent">
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function loadBudgetStatus() {
+    fetch('/api/budget_status')
+        .then(response => response.json())
+        .then(data => {
+            const budgetCard = document.getElementById('budgetCard');
+            const budgetContent = document.getElementById('budgetContent');
+            
+            if (data.length > 0) {
+                let html = '';
+                data.forEach(budget => {
+                    const percentage = (budget.spent / budget.limit) * 100;
+                    const colorClass = percentage > 80 ? 'danger' : percentage > 60 ? 'warning' : 'success';
+                    
+                    html += `
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <small>${budget.category}</small>
+                                <small>$${budget.spent.toFixed(2)} / $${budget.limit.toFixed(2)}</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-${colorClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                budgetContent.innerHTML = html;
+            } else {
+                budgetContent.innerHTML = '<p class="text-muted">No budgets set up yet.</p>';
+            }
+            
+            budgetCard.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading budget status:', error);
+            document.getElementById('budgetContent').innerHTML = '<p class="text-danger">Could not load budget data.</p>';
+            document.getElementById('budgetCard').style.display = 'block';
+        });
+}
+</script>
+{% endblock %}

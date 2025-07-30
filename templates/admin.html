@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - Finance Tracker{% endblock %}
+{% block content %}
+<h2><i class="fas fa-cogs"></i> Admin Panel</h2>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>Total Users</h5>
+                <h3>{{ users|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Total Transactions</h5>
+                <h3>{{ total_transactions }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> User Management</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[0] }}</td>
+                        <td>{{ user[1] }}</td>
+                        <td>{{ user[2] }}</td>
+                        <td>{{ user[3] }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewUserData({{ user[0] }}, '{{ user[1] }}')">
+                                View Budget
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function viewUserData(userId, username) {
+    // This is the intentionally vulnerable part: Admin can view any user's data
+    // by exploiting the IDOR in the API endpoint.
+    fetch(`/api/budget_status?user_id=${userId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(`Budget data for user: ${username} (ID: ${userId})\n\n${JSON.stringify(data, null, 2)}`);
+        })
+        .catch(error => {
+            console.error('Error fetching budget data:', error);
+            alert(`Could not fetch budget data for user ${username}. Check console for details.`);
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-4">Welcome to Personal Finance Tracker</h1>
+        <p class="lead">Take control of your finances with our secure and easy-to-use platform.</p>
+        <hr class="my-4">
+        {% if not session.user_id %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}">Get Started</a>
+            <a class="btn btn-outline-primary btn-lg" href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+        {% endif %}
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h5>Track Expenses</h5>
+                <p>Monitor your spending across different categories</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-piggy-bank fa-3x text-primary mb-3"></i>
+                <h5>Budget Management</h5>
+                <p>Set and track your monthly budgets</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                <h5>Secure</h5>
+                <p>Your financial data is protected and encrypted</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
