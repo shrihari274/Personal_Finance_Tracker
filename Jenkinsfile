@@ -41,11 +41,11 @@ pipeline {
                 script {
                     echo "Scanning image for vulnerabilities..."
                     withCredentials([
-                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),
+                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),       
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_package_scanner_cli:${SCANNER_VERSION} \\
                             -console-url=${DEEPFENCE_CONSOLE_URL} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -72,7 +72,7 @@ pipeline {
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_secret_scanner:${SCANNER_VERSION} \\
                             -image-name=${IMAGE_NAME} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -94,7 +94,7 @@ pipeline {
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_malware_scanner:${SCANNER_VERSION} \\
                             -image-name=${IMAGE_NAME} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -120,7 +120,7 @@ pipeline {
 
                     // Run the new container
                     echo "Starting new container ${CONTAINER_NAME} on port ${APP_PORT}"
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"      
                 }
             }
         }
