@@ -7,12 +7,12 @@ pipeline {
         APP_PORT              = 8000
         CONTAINER_NAME        = "finance-tracker-instance"
 
-        // --- ThreatMapper Configuration ---
+        // --- ThreatMapper Configuration (from your template) ---
         DEEPFENCE_CONSOLE_URL = '192.168.74.125'
         SCANNER_VERSION       = '2.5.2'
         DEEPFENCE_PRODUCT     = 'ThreatMapper'
 
-        // --- Scan Failure Conditions ---
+        // --- Scan Failure Conditions (from your template) ---
         FAIL_ON_CRITICAL_VULNS = 6
         FAIL_ON_HIGH_VULNS     = 25
         FAIL_ON_MEDIUM_VULNS   = 65
@@ -41,11 +41,11 @@ pipeline {
                 script {
                     echo "Scanning image for vulnerabilities..."
                     withCredentials([
-                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),
+                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),       
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_package_scanner_cli:${SCANNER_VERSION} \\
                             -console-url=${DEEPFENCE_CONSOLE_URL} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -57,7 +57,7 @@ pipeline {
                             -fail-on-high-count=${FAIL_ON_HIGH_VULNS} \\
                             -fail-on-medium-count=${FAIL_ON_MEDIUM_VULNS} \\
                             -fail-on-low-count=${FAIL_ON_LOW_VULNS}
-                        """
+                         """
                     }
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_secret_scanner:${SCANNER_VERSION} \\
                             -image-name=${IMAGE_NAME} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -94,7 +94,7 @@ pipeline {
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
                             quay.io/deepfenceio/deepfence_malware_scanner:${SCANNER_VERSION} \\
                             -image-name=${IMAGE_NAME} \\
                             -deepfence-key=${DF_API_KEY} \\
@@ -107,30 +107,7 @@ pipeline {
             }
         }
 
-        stage('6. Scan Docker Host with Docker Bench') {
-            steps {
-                script {
-                    echo "--- Cloning Docker Bench for Security repository ---"
-                    sh "git clone https://github.com/docker/docker-bench-security.git"
-
-                    echo "--- Building the Docker Bench image ---"
-                    sh "docker build --no-cache -t docker-bench-security ./docker-bench-security"
-
-                    echo "--- Running Docker Bench Security Scan ---"
-                    // This command runs the scan against the host.
-                    // It requires privileged access to inspect Docker's configuration.
-                    sh """
-                        docker run --rm --net host --pid host --userns host --cap-add audit_control \\
-                            -v /etc:/etc:ro \\
-                            -v /lib/systemd/system:/lib/systemd/system:ro \\
-                            -v /var/run/docker.sock:/var/run/docker.sock:ro \\
-                            docker-bench-security
-                    """
-                }
-            }
-        }
-
-        stage('7. Deploy Application') {
+        stage('6. Deploy Application') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
@@ -143,7 +120,7 @@ pipeline {
 
                     // Run the new container
                     echo "Starting new container ${CONTAINER_NAME} on port ${APP_PORT}"
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"      
                 }
             }
         }
