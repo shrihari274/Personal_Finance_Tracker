@@ -41,21 +41,22 @@ pipeline {
                 script {
                     echo "Scanning image for vulnerabilities..."
                     withCredentials([
-                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),       
+                        string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
+                        // CORRECTED: Removed trailing spaces after each backslash
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
-                            quay.io/deepfenceio/deepfence_package_scanner_cli:${SCANNER_VERSION} \\
-                            -console-url=${DEEPFENCE_CONSOLE_URL} \\
-                            -deepfence-key=${DF_API_KEY} \\
-                            -license=${DF_LICENSE_KEY} \\
-                            -product=${DEEPFENCE_PRODUCT} \\
-                            -source=${IMAGE_NAME} \\
-                            -scan-type=base,java,python,ruby,php,nodejs,js \\
-                            -fail-on-critical-count=${FAIL_ON_CRITICAL_VULNS} \\
-                            -fail-on-high-count=${FAIL_ON_HIGH_VULNS} \\
-                            -fail-on-medium-count=${FAIL_ON_MEDIUM_VULNS} \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \
+                            quay.io/deepfenceio/deepfence_package_scanner_cli:${SCANNER_VERSION} \
+                            -console-url=${DEEPFENCE_CONSOLE_URL} \
+                            -deepfence-key=${DF_API_KEY} \
+                            -license=${DF_LICENSE_KEY} \
+                            -product=${DEEPFENCE_PRODUCT} \
+                            -source=${IMAGE_NAME} \
+                            -scan-type=base,java,python,ruby,php,nodejs,js \
+                            -fail-on-critical-count=${FAIL_ON_CRITICAL_VULNS} \
+                            -fail-on-high-count=${FAIL_ON_HIGH_VULNS} \
+                            -fail-on-medium-count=${FAIL_ON_MEDIUM_VULNS} \
                             -fail-on-low-count=${FAIL_ON_LOW_VULNS}
                          """
                     }
@@ -71,13 +72,14 @@ pipeline {
                         string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
+                        // CORRECTED: Removed trailing spaces after each backslash
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
-                            quay.io/deepfenceio/deepfence_secret_scanner:${SCANNER_VERSION} \\
-                            -image-name=${IMAGE_NAME} \\
-                            -deepfence-key=${DF_API_KEY} \\
-                            -license=${DF_LICENSE_KEY} \\
-                            -product=${DEEPFENCE_PRODUCT} \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \
+                            quay.io/deepfenceio/deepfence_secret_scanner:${SCANNER_VERSION} \
+                            -image-name=${IMAGE_NAME} \
+                            -deepfence-key=${DF_API_KEY} \
+                            -license=${DF_LICENSE_KEY} \
+                            -product=${DEEPFENCE_PRODUCT} \
                             -fail-on-high-count=${FAIL_ON_HIGH_SECRETS}
                         """
                     }
@@ -93,13 +95,14 @@ pipeline {
                         string(credentialsId: 'deepfence-api-key', variable: 'DF_API_KEY'),
                         string(credentialsId: 'deepfence-license-key', variable: 'DF_LICENSE_KEY')
                     ]) {
+                        // CORRECTED: Removed trailing spaces after each backslash
                         sh """
-                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \\     
-                            quay.io/deepfenceio/deepfence_malware_scanner:${SCANNER_VERSION} \\
-                            -image-name=${IMAGE_NAME} \\
-                            -deepfence-key=${DF_API_KEY} \\
-                            -license=${DF_LICENSE_KEY} \\
-                            -product=${DEEPFENCE_PRODUCT} \\
+                            docker run --rm --net=host -v /var/run/docker.sock:/var/run/docker.sock:rw \
+                            quay.io/deepfenceio/deepfence_malware_scanner:${SCANNER_VERSION} \
+                            -image-name=${IMAGE_NAME} \
+                            -deepfence-key=${DF_API_KEY} \
+                            -license=${DF_LICENSE_KEY} \
+                            -product=${DEEPFENCE_PRODUCT} \
                             -fail-on-high-count=${FAIL_ON_HIGH_MALWARE}
                         """
                     }
@@ -114,13 +117,10 @@ pipeline {
             steps {
                 script {
                     echo "All scans passed. Deploying the application..."
-                    // Stop and remove any existing container with the same name to prevent conflicts
                     sh "docker stop ${CONTAINER_NAME} || true"
                     sh "docker rm ${CONTAINER_NAME} || true"
-
-                    // Run the new container
                     echo "Starting new container ${CONTAINER_NAME} on port ${APP_PORT}"
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"      
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}"
                 }
             }
         }
