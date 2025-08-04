@@ -13,12 +13,12 @@ pipeline {
         DEEPFENCE_PRODUCT     = 'ThreatMapper'
 
         // --- Scan Failure Conditions (from your template) ---
-        FAIL_ON_CRITICAL_VULNS = 6
-        FAIL_ON_HIGH_VULNS     = 25
-        FAIL_ON_MEDIUM_VULNS   = 65
-        FAIL_ON_LOW_VULNS      = 50
-        FAIL_ON_HIGH_SECRETS   = 4
-        FAIL_ON_HIGH_MALWARE   = 4
+        FAIL_ON_CRITICAL_VULNS = 2
+        FAIL_ON_HIGH_VULNS     = 15
+        FAIL_ON_MEDIUM_VULNS   = 30
+        FAIL_ON_LOW_VULNS      = 10
+        FAIL_ON_HIGH_SECRETS   = 3
+        FAIL_ON_HIGH_MALWARE   = 1
     }
 
     stages {
