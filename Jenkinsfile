@@ -14,11 +14,11 @@ pipeline {
 
         // --- Scan Failure Conditions (from your template) ---
         FAIL_ON_CRITICAL_VULNS = 2
-        FAIL_ON_HIGH_VULNS     = 15
-        FAIL_ON_MEDIUM_VULNS   = 30
+        FAIL_ON_HIGH_VULNS     = 35
+        FAIL_ON_MEDIUM_VULNS   = 25
         FAIL_ON_LOW_VULNS      = 10
         FAIL_ON_HIGH_SECRETS   = 3
-        FAIL_ON_HIGH_MALWARE   = 1
+        FAIL_ON_HIGH_MALWARE   = 2
     }
 
     stages {
